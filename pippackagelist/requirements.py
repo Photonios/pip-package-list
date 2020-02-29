@@ -5,6 +5,10 @@ from dataclasses import dataclass
 from typing import Generator, List, Optional
 
 
+class RequirementsEntryParseError(RuntimeError):
+    pass
+
+
 @dataclass
 class RequirementsEntrySource:
     path: str
@@ -23,7 +27,8 @@ class RequirementsRecursiveEntry(RequirementsEntry):
     absolute_path: str
 
     def __str__(self) -> str:
-        return f"-r {self.absolute_path}"
+        path = os.path.relpath(self.absolute_path, os.getcwd())
+        return f"-r {path}"
 
 
 @dataclass
@@ -35,7 +40,8 @@ class RequirementsEditableEntry(RequirementsEntry):
     resolved_absolute_path: str
 
     def __str__(self) -> str:
-        return f"-e {self.absolute_path}"
+        path = os.path.relpath(self.absolute_path, os.getcwd())
+        return f"-e {path}"
 
 
 @dataclass
@@ -156,6 +162,10 @@ def parse_package_requirements_entry(
         return RequirementsPackageEntry(
             source=source, name=parts[0], operator=operator, version=parts[1]
         )
+
+    raise RequirementsEntryParseError(
+        f"cannot parse '{line}' in {source.path}:{source.line_number}"
+    )
 
 
 def _clean_line(line: str) -> str:

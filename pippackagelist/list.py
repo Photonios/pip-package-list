@@ -15,8 +15,8 @@ from .setup_py_parser import parse_setup_py
 
 def list(
     file_paths: List[str],
-    recurse_recursive: bool = True,
-    recurse_editable: bool = True,
+    recurse_recursive: bool = False,
+    recurse_editable: bool = False,
 ) -> Generator[RequirementsEntry, None, None]:
     generators = []
 

@@ -1,0 +1,7 @@
+-e package-1
+django==1.1
+# comment weeeeh
+
+redis==2.0
+
+-r requirements-nested.txt
