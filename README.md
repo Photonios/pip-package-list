@@ -2,6 +2,7 @@
 
 [![License](https://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
 [![PyPi](https://badge.fury.io/py/pip-package-list.svg)](https://pypi.python.org/pypi/pip-package-list)
+![test](https://github.com/Photonios/pip-package-list/workflows/test/badge.svg)
 
 A small and definitely faulty tool that tries to form a list of packages that you depend on. This is useful in mono-repo's where all dependencies are split into dozens of `requirements.txt` and `setup.py` files.
 
