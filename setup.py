@@ -54,6 +54,9 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.5",
     ],
+    entry_points={
+        "console_scripts": ["pip-package-list=pippackagelist.__main__:main"]
+    },
     python_requires=">=3.7",
     install_requires=["setuptools==45.2.0"],
     extras_require={
