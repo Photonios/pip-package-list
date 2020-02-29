@@ -146,7 +146,6 @@ setup(
                     "--cov-report=xml:reports/xml",
                     "--cov-report=html:reports/html",
                     "--junitxml=reports/junit/tests.xml",
-                    "--reuse-db",
                 ]
             ],
         ),
