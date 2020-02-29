@@ -1,4 +1,3 @@
-import os
 
 from typing import Generator
 
@@ -19,11 +18,12 @@ def parse_setup_py(file_path: str) -> Generator[RequirementsEntry, None, None]:
 
     setuptools.setup = _setup_proxy
 
-    path = os.path.join(file_path, "setup.py")
-    with open(path, "r") as fp:
+    with open(file_path, "r") as fp:
         exec(fp.read())
 
-    source = RequirementsEntrySource(path=path, line=None, line_number=None)
+    source = RequirementsEntrySource(
+        path=file_path, line=None, line_number=None
+    )
 
     requirements = setup_kwargs.get("install_requires") or []
 

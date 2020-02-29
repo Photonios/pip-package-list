@@ -1,4 +1,5 @@
 import os
+import re
 
 from dataclasses import dataclass
 from typing import Generator, List, Optional
@@ -63,7 +64,7 @@ def parse_requirements(
             yield parse_editable_requirements_entry(line_source, stripped_line)
 
         # TODO: add support for other VCS's
-        elif stripped_line.startswith("git+"):
+        elif re.match(r"^(.+)\+", stripped_line):
             yield parse_vcs_requirements_entry(line_source, stripped_line)
         else:
             yield parse_package_requirements_entry(line_source, stripped_line)
@@ -120,4 +121,10 @@ def parse_package_requirements_entry(
 
 
 def _clean_line(line: str) -> str:
-    return line.strip().replace("\n", "").replace("\r", "")
+    return (
+        line.strip()
+        .replace("\n", "")
+        .replace("\r", "")
+        .replace("  ", " ")
+        .replace("  ", " ")
+    )
