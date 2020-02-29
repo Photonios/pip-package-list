@@ -57,7 +57,7 @@ setup(
     python_requires=">=3.7",
     install_requires=["setuptools==45.2.0"],
     extras_require={
-        "test": ["pytest==5.2.2", "pytest-cov==2.8.1", ],
+        "test": ["pytest==5.2.2", "pytest-cov==2.8.1",],
         "analysis": [
             "black==19.10b0",
             "flake8==3.7.7",
