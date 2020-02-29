@@ -8,7 +8,7 @@ from pippackagelist.requirements import (
 from pippackagelist.requirements_txt_parser import parse_requirements_txt
 
 requirements_txt_path = os.path.join(
-    os.path.dirname(__file__), "./fixtures/requirements.txt"
+    os.path.dirname(__file__), "./test-cases/requirements.txt"
 )
 
 

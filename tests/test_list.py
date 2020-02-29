@@ -3,7 +3,7 @@ import os
 from pippackagelist.list import list as list_packages
 
 test_case_1_path = os.path.join(
-    os.path.dirname(__file__), "./fixtures/list-test-case-1"
+    os.path.dirname(__file__), "./test-cases/list-1"
 )
 
 
@@ -14,10 +14,10 @@ def test_list_from_requirements():
         str(requirement) for requirement in list_packages([path])
     ]
     assert raw_requirements == [
-        "-e tests/fixtures/list-test-case-1/package-1",
+        "-e tests/test-cases/list-1/package-1",
         "django==1.1",
         "redis==2.0",
-        "-r tests/fixtures/list-test-case-1/requirements-nested.txt",
+        "-r tests/test-cases/list-1/requirements-nested.txt",
     ]
 
 
@@ -30,11 +30,11 @@ def test_list_from_requirements_recurse_recursive():
     ]
 
     assert raw_requirements == [
-        "-e tests/fixtures/list-test-case-1/package-1",
+        "-e tests/test-cases/list-1/package-1",
         "django==1.1",
         "redis==2.0",
         "test>=1.2",
-        "-e tests/fixtures/list-test-case-1/package-2",
+        "-e tests/test-cases/list-1/package-2",
     ]
 
 
@@ -49,7 +49,7 @@ def test_list_from_requirements_recurse_editable():
     assert raw_requirements == [
         "django==1.1",
         "redis==2.0",
-        "-r tests/fixtures/list-test-case-1/requirements-nested.txt",
+        "-r tests/test-cases/list-1/requirements-nested.txt",
         "pyyaml>=2.1",
         "grpcio==9.1",
         "pytest==5.2",
