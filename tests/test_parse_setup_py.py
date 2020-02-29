@@ -2,18 +2,14 @@ import os
 
 from pippackagelist.requirements import (
     RequirementsEditableEntry,
-    RequirementsEntrySource,
     RequirementsPackageEntry,
     RequirementsRecursiveEntry,
-    RequirementsVCSPackageEntry,
 )
 from pippackagelist.setup_py_parser import parse_setup_py
 
-setup_py_path = os.path.join(
-    os.path.dirname(__file__), "./fixtures/setup_py.py"
-)
+setup_py_path = os.path.join(os.path.dirname(__file__), "./fixtures/setup.py")
 setup_py_with_extras_path = os.path.join(
-    os.path.dirname(__file__), "./fixtures/setup_py_with_extras.py"
+    os.path.dirname(__file__), "./fixtures/setup_with_extras.py"
 )
 
 
