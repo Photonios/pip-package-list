@@ -1,3 +1,5 @@
+import os
+
 from typing import Generator
 
 import setuptools
@@ -21,7 +23,7 @@ def parse_setup_py(file_path: str) -> Generator[RequirementsEntry, None, None]:
         exec(fp.read())
 
     source = RequirementsEntrySource(
-        path=file_path, line=None, line_number=None
+        path=os.path.realpath(file_path), line=None, line_number=None
     )
 
     requirements = setup_kwargs.get("install_requires") or []

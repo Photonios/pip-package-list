@@ -27,7 +27,7 @@ def test_parse_requirements_recursive_entry(path):
     assert requirements[0].source.path == source.path
     assert requirements[0].source.line == line
     assert requirements[0].source.line_number == 1
-    assert requirements[0].path == os.path.realpath(
+    assert requirements[0].absolute_path == os.path.realpath(
         os.path.join(os.getcwd(), path)
     )
 
@@ -43,7 +43,7 @@ def test_parse_requirements_editable_entry(path):
     assert requirements[0].source.path == source.path
     assert requirements[0].source.line == line
     assert requirements[0].source.line_number == 1
-    assert requirements[0].path == os.path.realpath(
+    assert requirements[0].absolute_path == os.path.realpath(
         os.path.join(os.getcwd(), path)
     )
 
@@ -126,13 +126,15 @@ def test_parse_requirements_ignores_leading_and_trailing_whitespace():
     assert requirements[1].source.path == source.path
     assert requirements[1].source.line == "-r ./otherfile.txt"
     assert requirements[1].source.line_number == 2
-    assert requirements[1].path == os.path.join(os.getcwd(), "otherfile.txt")
+    assert requirements[1].absolute_path == os.path.join(
+        os.getcwd(), "otherfile.txt"
+    )
 
     assert isinstance(requirements[2], RequirementsEditableEntry)
     assert requirements[2].source.path == source.path
     assert requirements[2].source.line == "-e ../"
     assert requirements[2].source.line_number == 3
-    assert requirements[2].path == os.path.realpath(
+    assert requirements[2].absolute_path == os.path.realpath(
         os.path.join(os.getcwd(), "..")
     )
 

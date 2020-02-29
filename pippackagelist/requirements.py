@@ -19,12 +19,23 @@ class RequirementsEntry:
 
 @dataclass
 class RequirementsRecursiveEntry(RequirementsEntry):
-    path: str
+    original_path: str
+    absolute_path: str
+
+    def __str__(self) -> str:
+        return f"-r {self.absolute_path}"
 
 
 @dataclass
 class RequirementsEditableEntry(RequirementsEntry):
-    path: str
+    original_path: str
+    absolute_path: str
+
+    resolved_path: str
+    resolved_absolute_path: str
+
+    def __str__(self) -> str:
+        return f"-e {self.absolute_path}"
 
 
 @dataclass
@@ -33,12 +44,22 @@ class RequirementsVCSPackageEntry(RequirementsEntry):
     uri: str
     tag: Optional[str]
 
+    def __str__(self) -> str:
+        result = f"{self.vcs}+{self.uri}"
+        if self.tag:
+            result += f"#{self.tag}"
+
+        return result
+
 
 @dataclass
 class RequirementsPackageEntry(RequirementsEntry):
     name: str
     operator: str
     version: str
+
+    def __str__(self) -> str:
+        return f"{self.name}{self.operator}{self.version}"
 
 
 def parse_requirements(
@@ -63,7 +84,6 @@ def parse_requirements(
         elif stripped_line.startswith("-e"):
             yield parse_editable_requirements_entry(line_source, stripped_line)
 
-        # TODO: add support for other VCS's
         elif re.match(r"^(.+)\+", stripped_line):
             yield parse_vcs_requirements_entry(line_source, stripped_line)
         else:
@@ -73,20 +93,38 @@ def parse_requirements(
 def parse_recursive_requirements_entry(
     source: RequirementsEntrySource, line: str
 ) -> RequirementsRecursiveEntry:
-    path = _clean_line(line.replace("-r", ""))
+    original_path = _clean_line(line.replace("-r", ""))
+    absolute_path = os.path.realpath(
+        os.path.join(os.path.dirname(source.path), original_path)
+    )
+
     return RequirementsRecursiveEntry(
-        source=source,
-        path=os.path.realpath(os.path.join(os.path.dirname(source.path), path)),
+        source=source, original_path=original_path, absolute_path=absolute_path,
     )
 
 
 def parse_editable_requirements_entry(
     source: RequirementsEntrySource, line: str
 ) -> RequirementsEditableEntry:
-    path = _clean_line(line.replace("-e", ""))
+    original_path = _clean_line(line.replace("-e", ""))
+    resolved_path = original_path
+
+    if not original_path.endswith(".py"):
+        resolved_path = os.path.join(original_path, "setup.py")
+
+    absolute_path = os.path.realpath(
+        os.path.join(os.path.dirname(source.path), original_path)
+    )
+    resolved_absolute_path = os.path.realpath(
+        os.path.join(os.path.dirname(source.path), resolved_path)
+    )
+
     return RequirementsEditableEntry(
         source=source,
-        path=os.path.realpath(os.path.join(os.path.dirname(source.path), path)),
+        original_path=original_path,
+        absolute_path=absolute_path,
+        resolved_path=resolved_path,
+        resolved_absolute_path=resolved_absolute_path,
     )
 
 

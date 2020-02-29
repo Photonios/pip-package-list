@@ -23,7 +23,7 @@ def test_parse_setup_py():
     assert isinstance(requirements[3], RequirementsEditableEntry)
 
     for index, requirement in enumerate(requirements):
-        assert requirement.source.path == setup_py_path
+        assert requirement.source.path == os.path.realpath(setup_py_path)
         assert requirement.source.line_number == index + 1
 
 

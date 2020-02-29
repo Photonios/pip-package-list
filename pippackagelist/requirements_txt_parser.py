@@ -1,3 +1,5 @@
+import os
+
 from typing import Generator
 
 from .requirements import (
@@ -11,7 +13,7 @@ def parse_requirements_txt(
     file_path: str,
 ) -> Generator[RequirementsEntry, None, None]:
     source = RequirementsEntrySource(
-        path=file_path, line=None, line_number=None
+        path=os.path.realpath(file_path), line=None, line_number=None
     )
 
     with open(file_path, "r") as fp:

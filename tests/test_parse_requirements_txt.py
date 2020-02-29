@@ -22,5 +22,7 @@ def test_parse_requirements_txt():
     assert isinstance(requirements[3], RequirementsEditableEntry)
 
     for index, requirement in enumerate(requirements):
-        assert requirement.source.path == requirements_txt_path
+        assert requirement.source.path == os.path.realpath(
+            requirements_txt_path
+        )
         assert requirement.source.line_number == index + 1
