@@ -2,14 +2,14 @@ import os
 
 import pytest
 
-from pippackagelist.requirements import (
+from pippackagelist.entry import (
     RequirementsEditableEntry,
     RequirementsEntrySource,
     RequirementsPackageEntry,
     RequirementsRecursiveEntry,
     RequirementsVCSPackageEntry,
-    parse_requirements,
 )
+from pippackagelist.parse_requirements_list import parse_requirements_list
 
 source = RequirementsEntrySource(
     path="requirements.txt", line=None, line_number=None,
@@ -20,7 +20,7 @@ source = RequirementsEntrySource(
 def test_parse_requirements_recursive_entry(path):
     line = "-r %s" % path
 
-    requirements = list(parse_requirements(source, [line]))
+    requirements = list(parse_requirements_list(source, [line]))
     assert len(requirements) == 1
 
     assert isinstance(requirements[0], RequirementsRecursiveEntry)
@@ -36,7 +36,7 @@ def test_parse_requirements_recursive_entry(path):
 def test_parse_requirements_editable_entry(path):
     line = "-e %s" % path
 
-    requirements = list(parse_requirements(source, [line]))
+    requirements = list(parse_requirements_list(source, [line]))
     assert len(requirements) == 1
 
     assert isinstance(requirements[0], RequirementsEditableEntry)
@@ -58,7 +58,7 @@ def test_parse_requirements_vcs_package_entry(vcs, uri, tag):
     if tag:
         line += f"#{tag}"
 
-    requirements = list(parse_requirements(source, [line]))
+    requirements = list(parse_requirements_list(source, [line]))
     assert len(requirements) == 1
 
     assert isinstance(requirements[0], RequirementsVCSPackageEntry)
@@ -74,7 +74,7 @@ def test_parse_requirements_vcs_package_entry(vcs, uri, tag):
 def test_parse_requirements_package_entry(operator):
     line = "django%s1.0" % operator
 
-    requirements = list(parse_requirements(source, [line]))
+    requirements = list(parse_requirements_list(source, [line]))
     assert len(requirements) == 1
 
     assert isinstance(requirements[0], RequirementsPackageEntry)
@@ -95,7 +95,7 @@ def test_parse_requirements_skips_comments_and_blank_lines():
         "   # another comment",
     ]
 
-    requirements = list(parse_requirements(source, lines))
+    requirements = list(parse_requirements_list(source, lines))
     assert len(requirements) == 1
     assert isinstance(requirements[0], RequirementsPackageEntry)
 
@@ -108,7 +108,7 @@ def test_parse_requirements_ignores_leading_and_trailing_whitespace():
         "    git+https://github.com/test/test#tag",
     ]
 
-    requirements = list(parse_requirements(source, lines))
+    requirements = list(parse_requirements_list(source, lines))
     assert len(requirements) == 4
 
     assert isinstance(requirements[2], RequirementsEditableEntry)

@@ -1,19 +1,19 @@
 from typing import Generator, List
 
-from .identify_package_list_file_type import (
-    PackageListFileType,
-    identify_package_list_file_type,
-)
-from .requirements import (
+from .entry import (
     RequirementsEditableEntry,
     RequirementsEntry,
     RequirementsRecursiveEntry,
 )
-from .requirements_txt_parser import parse_requirements_txt
-from .setup_py_parser import parse_setup_py
+from .identify_package_list_file_type import (
+    PackageListFileType,
+    identify_package_list_file_type,
+)
+from .parse_requirements_txt import parse_requirements_txt
+from .parse_setup_py import parse_setup_py
 
 
-def list(
+def list_packages_from_files(
     file_paths: List[str],
     recurse_recursive: bool = False,
     recurse_editable: bool = False,

@@ -4,11 +4,8 @@ from typing import Generator
 
 import setuptools
 
-from .requirements import (
-    RequirementsEntry,
-    RequirementsEntrySource,
-    parse_requirements,
-)
+from .entry import RequirementsEntry, RequirementsEntrySource
+from .parse_requirements_list import parse_requirements_list
 
 
 def parse_setup_py(file_path: str) -> Generator[RequirementsEntry, None, None]:
@@ -32,5 +29,5 @@ def parse_setup_py(file_path: str) -> Generator[RequirementsEntry, None, None]:
     for _, extra_requirements in extras_require.items():
         requirements.extend(extra_requirements)
 
-    for requirement in parse_requirements(source, requirements):
+    for requirement in parse_requirements_list(source, requirements):
         yield requirement

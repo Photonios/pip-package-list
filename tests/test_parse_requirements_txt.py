@@ -1,11 +1,11 @@
 import os
 
-from pippackagelist.requirements import (
+from pippackagelist.entry import (
     RequirementsEditableEntry,
     RequirementsPackageEntry,
     RequirementsRecursiveEntry,
 )
-from pippackagelist.requirements_txt_parser import parse_requirements_txt
+from pippackagelist.parse_requirements_txt import parse_requirements_txt
 
 requirements_txt_path = os.path.join(
     os.path.dirname(__file__), "./test-cases/requirements.txt"

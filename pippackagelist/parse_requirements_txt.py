@@ -2,11 +2,8 @@ import os
 
 from typing import Generator
 
-from .requirements import (
-    RequirementsEntry,
-    RequirementsEntrySource,
-    parse_requirements,
-)
+from .entry import RequirementsEntry, RequirementsEntrySource
+from .parse_requirements_list import parse_requirements_list
 
 
 def parse_requirements_txt(
@@ -17,5 +14,5 @@ def parse_requirements_txt(
     )
 
     with open(file_path, "r") as fp:
-        for requirement in parse_requirements(source, fp.readlines()):
+        for requirement in parse_requirements_list(source, fp.readlines()):
             yield requirement

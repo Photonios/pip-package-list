@@ -1,11 +1,11 @@
 import os
 
-from pippackagelist.requirements import (
+from pippackagelist.entry import (
     RequirementsEditableEntry,
     RequirementsPackageEntry,
     RequirementsRecursiveEntry,
 )
-from pippackagelist.setup_py_parser import parse_setup_py
+from pippackagelist.parse_setup_py import parse_setup_py
 
 setup_py_path = os.path.join(os.path.dirname(__file__), "./test-cases/setup.py")
 setup_py_with_extras_path = os.path.join(

@@ -1,17 +1,17 @@
 import os
 
-from pippackagelist.list import list as list_packages
+from pippackagelist.list_packages_from_files import list_packages_from_files
 
 test_case_1_path = os.path.join(
     os.path.dirname(__file__), "./test-cases/list-1"
 )
 
 
-def test_list_from_requirements():
+def test_list_packages_from_files_from_requirements():
     path = os.path.join(test_case_1_path, "requirements.txt")
 
     raw_requirements = [
-        str(requirement) for requirement in list_packages([path])
+        str(requirement) for requirement in list_packages_from_files([path])
     ]
     assert raw_requirements == [
         "-e tests/test-cases/list-1/package-1",
@@ -21,12 +21,14 @@ def test_list_from_requirements():
     ]
 
 
-def test_list_from_requirements_recurse_recursive():
+def test_list_packages_from_files_from_requirements_recurse_recursive():
     path = os.path.join(test_case_1_path, "requirements.txt")
 
     raw_requirements = [
         str(requirement)
-        for requirement in list_packages([path], recurse_recursive=True)
+        for requirement in list_packages_from_files(
+            [path], recurse_recursive=True
+        )
     ]
 
     assert raw_requirements == [
@@ -38,12 +40,14 @@ def test_list_from_requirements_recurse_recursive():
     ]
 
 
-def test_list_from_requirements_recurse_editable():
+def test_list_packages_from_files_from_requirements_recurse_editable():
     path = os.path.join(test_case_1_path, "requirements.txt")
 
     raw_requirements = [
         str(requirement)
-        for requirement in list_packages([path], recurse_editable=True)
+        for requirement in list_packages_from_files(
+            [path], recurse_editable=True
+        )
     ]
 
     assert raw_requirements == [
