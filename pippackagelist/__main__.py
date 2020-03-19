@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from .list import list as list_packages
+from .list_packages_from_files import list_packages_from_files
 
 
 def main() -> int:
@@ -26,7 +26,7 @@ def main() -> int:
 
     args = parser.parse_args()
 
-    for requirement in list_packages(
+    for requirement in list_packages_from_files(
         args.file_paths,
         recurse_recursive=args.recurse_recursive,
         recurse_editable=args.recurse_editable,
