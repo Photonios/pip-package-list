@@ -54,6 +54,14 @@ class RequirementsVCSPackageEntry(RequirementsEntry):
 
 
 @dataclass
+class RequirementsWheelPackageEntry(RequirementsEntry):
+    uri: str
+
+    def __str__(self) -> str:
+        return self.uri
+
+
+@dataclass
 class RequirementsPackageEntry(RequirementsEntry):
     name: str
     operator: str

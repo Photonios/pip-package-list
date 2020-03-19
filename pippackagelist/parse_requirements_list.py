@@ -10,6 +10,7 @@ from .entry import (
     RequirementsPackageEntry,
     RequirementsRecursiveEntry,
     RequirementsVCSPackageEntry,
+    RequirementsWheelPackageEntry,
 )
 
 
@@ -41,6 +42,10 @@ def parse_requirements_list(
 
         elif re.match(r"^(.+)\+", stripped_line):
             yield parse_vcs_requirements_entry(line_source, stripped_line)
+
+        elif stripped_line.endswith("whl"):
+            yield parse_wheel_requirements_entry(line_source, stripped_line)
+
         else:
             yield parse_package_requirements_entry(line_source, stripped_line)
 
@@ -97,6 +102,12 @@ def parse_vcs_requirements_entry(
         tag = uri_tag_split[1]
 
     return RequirementsVCSPackageEntry(source=source, vcs=vcs, uri=uri, tag=tag)
+
+
+def parse_wheel_requirements_entry(
+    source: RequirementsEntrySource, line: str
+) -> RequirementsWheelPackageEntry:
+    return RequirementsWheelPackageEntry(source=source, uri=line,)
 
 
 def parse_package_requirements_entry(
