@@ -1,6 +1,7 @@
 import argparse
 import sys
 
+from .entry import RequirementsEditableEntry
 from .list_packages_from_files import list_packages_from_files
 
 
@@ -19,6 +20,18 @@ def main() -> int:
         action="store_true",
     )
     parser.add_argument(
+        "--dedupe",
+        default=False,
+        help="de-duplicate the resulting list",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--remove-editable",
+        default=False,
+        help="remove editable requirements from the final list",
+        action="store_true",
+    )
+    parser.add_argument(
         "file_paths",
         nargs="+",
         help="list of requirements.txt or setup.py files",
@@ -26,12 +39,26 @@ def main() -> int:
 
     args = parser.parse_args()
 
-    for requirement in list_packages_from_files(
+    reqs = list_packages_from_files(
         args.file_paths,
         recurse_recursive=args.recurse_recursive,
         recurse_editable=args.recurse_editable,
-    ):
-        print(requirement)
+    )
+
+    if args.remove_editable:
+        reqs = [
+            requirement
+            for requirement in reqs
+            if not isinstance(requirement, RequirementsEditableEntry)
+        ]
+
+    if args.dedupe:
+        deduped_reqs = list(set([str(requirement) for requirement in reqs]))
+        for requirement in deduped_reqs:
+            print(requirement)
+    else:
+        for requirement in reqs:
+            print(requirement)
 
     return 0
 
