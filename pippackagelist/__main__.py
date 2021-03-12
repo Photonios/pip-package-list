@@ -3,6 +3,7 @@ import sys
 
 from .entry import (
     RequirementsEditableEntry,
+    RequirementsPackageEntry,
     RequirementsRecursiveEntry,
     RequirementsVCSPackageEntry,
     RequirementsWheelPackageEntry,
@@ -55,6 +56,12 @@ def main() -> int:
         action="store_true",
     )
     parser.add_argument(
+        "--remove-unversioned",
+        default=False,
+        help="remove requirements without a version number from the final list",
+        action="store_true",
+    )
+    parser.add_argument(
         "file_paths",
         nargs="+",
         help="list of requirements.txt or setup.py files",
@@ -95,6 +102,19 @@ def main() -> int:
             for requirement in reqs
             if not isinstance(requirement, RequirementsWheelPackageEntry)
         ]
+
+    if args.remove_unversioned:
+        versioned_reqs = []
+        for requirement in reqs:
+            if (
+                isinstance(requirement, RequirementsPackageEntry)
+                and not requirement.version
+            ):
+                continue
+
+            versioned_reqs.append(requirement)
+
+        reqs = versioned_reqs
 
     if args.dedupe:
         deduped_reqs = list(set([str(requirement) for requirement in reqs]))
