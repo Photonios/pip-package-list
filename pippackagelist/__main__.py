@@ -1,14 +1,7 @@
 import argparse
 import sys
 
-from .entry import (
-    RequirementsEditableEntry,
-    RequirementsPackageEntry,
-    RequirementsRecursiveEntry,
-    RequirementsVCSPackageEntry,
-    RequirementsWheelPackageEntry,
-)
-from .list_packages_from_files import list_packages_from_files
+from . import cli
 
 
 def main() -> int:
@@ -69,60 +62,20 @@ def main() -> int:
 
     args = parser.parse_args()
 
-    reqs = list_packages_from_files(
+    requirements = cli.run(
         args.file_paths,
         recurse_recursive=args.recurse_recursive,
         recurse_editable=args.recurse_editable,
+        remove_editable=args.remove_editable,
+        remove_recursive=args.remove_recursive,
+        remove_vcs=args.remove_vcs,
+        remove_wheel=args.remove_wheel,
+        remove_unversioned=args.remove_unversioned,
+        dedupe=args.dedupe,
     )
 
-    if args.remove_editable:
-        reqs = [
-            requirement
-            for requirement in reqs
-            if not isinstance(requirement, RequirementsEditableEntry)
-        ]
-
-    if args.remove_recursive:
-        reqs = [
-            requirement
-            for requirement in reqs
-            if not isinstance(requirement, RequirementsRecursiveEntry)
-        ]
-
-    if args.remove_vcs:
-        reqs = [
-            requirement
-            for requirement in reqs
-            if not isinstance(requirement, RequirementsVCSPackageEntry)
-        ]
-
-    if args.remove_wheel:
-        reqs = [
-            requirement
-            for requirement in reqs
-            if not isinstance(requirement, RequirementsWheelPackageEntry)
-        ]
-
-    if args.remove_unversioned:
-        versioned_reqs = []
-        for requirement in reqs:
-            if (
-                isinstance(requirement, RequirementsPackageEntry)
-                and not requirement.version
-            ):
-                continue
-
-            versioned_reqs.append(requirement)
-
-        reqs = versioned_reqs
-
-    if args.dedupe:
-        deduped_reqs = list(set([str(requirement) for requirement in reqs]))
-        for requirement in deduped_reqs:
-            print(requirement)
-    else:
-        for requirement in reqs:
-            print(requirement)
+    for req in requirements:
+        print(req)
 
     return 0
 
