@@ -1,7 +1,7 @@
 import os
 import re
 
-from typing import Generator, List, Optional
+from typing import Generator, List, Optional, Tuple
 
 from .entry import (
     RequirementsEditableEntry,
@@ -34,26 +34,40 @@ def parse_requirements_list(
                 path=source.path, line=stripped_line, line_number=index + 1
             )
 
-        if stripped_line.startswith("-r"):
-            yield parse_recursive_requirements_entry(line_source, stripped_line)
+        requirement, markers = _split_requirement_and_markers(stripped_line)
 
-        elif stripped_line.startswith("-e"):
-            yield parse_editable_requirements_entry(line_source, stripped_line)
+        if requirement.startswith("-r"):
+            yield parse_recursive_requirements_entry(
+                line_source, requirement, markers
+            )
 
-        elif re.match(r"^(.+)\+", stripped_line):
-            yield parse_vcs_requirements_entry(line_source, stripped_line)
+        elif requirement.startswith("-e"):
+            yield parse_editable_requirements_entry(
+                line_source, requirement, markers
+            )
 
-        elif stripped_line.endswith("whl"):
-            yield parse_wheel_requirements_entry(line_source, stripped_line)
+        elif re.match(r"^(.+)\+", requirement):
+            yield parse_vcs_requirements_entry(
+                line_source, requirement, markers
+            )
+
+        elif requirement.endswith("whl"):
+            yield parse_wheel_requirements_entry(
+                line_source, requirement, markers
+            )
 
         else:
-            yield parse_package_requirements_entry(line_source, stripped_line)
+            yield parse_package_requirements_entry(
+                line_source, requirement, markers
+            )
 
 
 def parse_recursive_requirements_entry(
-    source: RequirementsEntrySource, line: str
+    source: RequirementsEntrySource,
+    requirement: str,
+    markers: Optional[str] = None,
 ) -> RequirementsRecursiveEntry:
-    original_path = _clean_line(line.replace("-r", ""))
+    original_path = _clean_line(requirement.replace("-r", ""))
     absolute_path = os.path.realpath(
         os.path.join(os.path.dirname(source.path), original_path)
     )
@@ -64,9 +78,11 @@ def parse_recursive_requirements_entry(
 
 
 def parse_editable_requirements_entry(
-    source: RequirementsEntrySource, line: str
+    source: RequirementsEntrySource,
+    requirement: str,
+    markers: Optional[str] = None,
 ) -> RequirementsEditableEntry:
-    original_path = _clean_line(line.replace("-e", ""))
+    original_path = _clean_line(requirement.replace("-e", ""))
     resolved_path = original_path
 
     if not original_path.endswith(".py"):
@@ -89,9 +105,11 @@ def parse_editable_requirements_entry(
 
 
 def parse_vcs_requirements_entry(
-    source: RequirementsEntrySource, line: str
+    source: RequirementsEntrySource,
+    requirement: str,
+    markers: Optional[str] = None,
 ) -> RequirementsVCSPackageEntry:
-    vcs_uri_split = line.split("+")
+    vcs_uri_split = requirement.split("+")
     vcs = vcs_uri_split[0]
 
     uri_tag_split = vcs_uri_split[1].split("#")
@@ -105,26 +123,32 @@ def parse_vcs_requirements_entry(
 
 
 def parse_wheel_requirements_entry(
-    source: RequirementsEntrySource, line: str
+    source: RequirementsEntrySource, requirement, markers: Optional[str] = None,
 ) -> RequirementsWheelPackageEntry:
-    return RequirementsWheelPackageEntry(source=source, uri=line,)
+    return RequirementsWheelPackageEntry(source=source, uri=requirement)
 
 
 def parse_package_requirements_entry(
-    source: RequirementsEntrySource, line: str
+    source: RequirementsEntrySource,
+    requirement: str,
+    markers: Optional[str] = None,
 ) -> RequirementsPackageEntry:
     operators = ["==", ">=", ">", "<=", "<"]
     for operator in operators:
-        parts = line.split(operator)
+        parts = requirement.split(operator)
         if len(parts) == 1:
             continue
 
         return RequirementsPackageEntry(
-            source=source, name=parts[0], operator=operator, version=parts[1]
+            source=source,
+            name=parts[0],
+            operator=operator,
+            version=parts[1],
+            markers=markers,
         )
 
     return RequirementsPackageEntry(
-        source=source, name=line, operator="", version="",
+        source=source, name=requirement, markers=markers,
     )
 
 
@@ -136,3 +160,16 @@ def _clean_line(line: str) -> str:
         .replace("  ", " ")
         .replace("  ", " ")
     )
+
+
+def _split_requirement_and_markers(line: str) -> Tuple[str, Optional[str]]:
+    requirement = line
+    markers = None
+
+    if ";" in requirement:
+        requirement, markers = requirement.split(";")
+
+        requirement = requirement.strip()
+        markers = markers.strip()
+
+    return requirement, markers

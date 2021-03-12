@@ -8,6 +8,7 @@ from pippackagelist.entry import (
     RequirementsPackageEntry,
     RequirementsRecursiveEntry,
     RequirementsVCSPackageEntry,
+    RequirementsWheelPackageEntry,
 )
 from pippackagelist.parse_requirements_list import parse_requirements_list
 
@@ -84,6 +85,7 @@ def test_parse_requirements_package_entry(operator):
     assert requirements[0].name == "django"
     assert requirements[0].version == "1.0"
     assert requirements[0].operator == operator
+    assert not requirements[0].markers
 
 
 def test_parse_requirements_package_entry_no_operator():
@@ -97,8 +99,42 @@ def test_parse_requirements_package_entry_no_operator():
     assert requirements[0].source.line == line
     assert requirements[0].source.line_number == 1
     assert requirements[0].name == "django"
-    assert requirements[0].version == ""
-    assert requirements[0].operator == ""
+    assert not requirements[0].version
+    assert not requirements[0].operator
+    assert not requirements[0].markers
+
+
+def test_parse_requirements_package_entry_with_markers():
+    line = 'django==1.2; sys_platform == "linux" and python_version < "3.9"'
+
+    requirements = list(parse_requirements_list(source, [line]))
+    assert len(requirements) == 1
+
+    assert isinstance(requirements[0], RequirementsPackageEntry)
+    assert requirements[0].source.path == source.path
+    assert requirements[0].source.line == line
+    assert requirements[0].source.line_number == 1
+    assert requirements[0].name == "django"
+    assert requirements[0].version == "1.2"
+    assert requirements[0].operator == "=="
+    assert (
+        requirements[0].markers
+        == 'sys_platform == "linux" and python_version < "3.9"'
+    )
+
+
+def test_parse_requirements_wheel_package_entry():
+    line = "https://mywebsite.com/mywheel.whl"
+
+    requirements = list(parse_requirements_list(source, [line]))
+    assert len(requirements) == 1
+
+    assert isinstance(requirements[0], RequirementsWheelPackageEntry)
+    assert requirements[0].source.path == source.path
+    assert requirements[0].source.line == line
+    assert requirements[0].source.line_number == 1
+    assert requirements[0].uri == "https://mywebsite.com/mywheel.whl"
+    assert not requirements[0].markers
 
 
 def test_parse_requirements_skips_comments_and_blank_lines():

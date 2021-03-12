@@ -56,16 +56,33 @@ class RequirementsVCSPackageEntry(RequirementsEntry):
 @dataclass
 class RequirementsWheelPackageEntry(RequirementsEntry):
     uri: str
+    markers: Optional[str] = None
 
     def __str__(self) -> str:
-        return self.uri
+        line = self.uri
+        if self.markers:
+            line += f" ; {self.markers}"
+
+        return line
 
 
 @dataclass
 class RequirementsPackageEntry(RequirementsEntry):
     name: str
-    operator: str
-    version: str
+    operator: Optional[str] = None
+    version: Optional[str] = None
+    markers: Optional[str] = None
 
     def __str__(self) -> str:
-        return f"{self.name}{self.operator}{self.version}"
+        line = self.name
+
+        if self.operator:
+            line += self.operator
+
+        if self.version:
+            line += self.version
+
+        if self.markers:
+            line += f"; {self.markers}"
+
+        return line
