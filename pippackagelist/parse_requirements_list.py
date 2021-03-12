@@ -123,8 +123,8 @@ def parse_package_requirements_entry(
             source=source, name=parts[0], operator=operator, version=parts[1]
         )
 
-    raise RequirementsEntryParseError(
-        f"cannot parse '{line}' in {source.path}:{source.line_number}"
+    return RequirementsPackageEntry(
+        source=source, name=line, operator="", version="",
     )
 
 

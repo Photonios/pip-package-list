@@ -86,6 +86,21 @@ def test_parse_requirements_package_entry(operator):
     assert requirements[0].operator == operator
 
 
+def test_parse_requirements_package_entry_no_operator():
+    line = "django"
+
+    requirements = list(parse_requirements_list(source, [line]))
+    assert len(requirements) == 1
+
+    assert isinstance(requirements[0], RequirementsPackageEntry)
+    assert requirements[0].source.path == source.path
+    assert requirements[0].source.line == line
+    assert requirements[0].source.line_number == 1
+    assert requirements[0].name == "django"
+    assert requirements[0].version == ""
+    assert requirements[0].operator == ""
+
+
 def test_parse_requirements_skips_comments_and_blank_lines():
     lines = [
         "# this is a comment",
