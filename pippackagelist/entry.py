@@ -1,7 +1,7 @@
 import os
 
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import List, Optional
 
 
 @dataclass
@@ -34,9 +34,14 @@ class RequirementsEditableEntry(RequirementsEntry):
     resolved_path: str
     resolved_absolute_path: str
 
+    extras: List[str] = field(default_factory=list)
+
     def __str__(self) -> str:
-        path = os.path.relpath(self.absolute_path, os.getcwd())
-        return f"-e {path}"
+        line = os.path.relpath(self.absolute_path, os.getcwd())
+        if self.extras:
+            line += "[" + ",".join(self.extras) + "]"
+
+        return f"-e {line}"
 
 
 @dataclass
@@ -83,12 +88,16 @@ class RequirementsDirectRefEntry(RequirementsEntry):
 @dataclass
 class RequirementsPackageEntry(RequirementsEntry):
     name: str
+    extras: List[str] = field(default_factory=list)
     operator: Optional[str] = None
     version: Optional[str] = None
     markers: Optional[str] = None
 
     def __str__(self) -> str:
         line = self.name
+
+        if self.extras:
+            line += "[" + ",".join(self.extras) + "]"
 
         if self.operator:
             line += self.operator

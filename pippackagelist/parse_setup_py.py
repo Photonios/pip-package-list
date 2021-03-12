@@ -1,6 +1,6 @@
 import os
 
-from typing import Generator
+from typing import Generator, List
 
 import setuptools
 
@@ -8,7 +8,9 @@ from .entry import RequirementsEntry, RequirementsEntrySource
 from .parse_requirements_list import parse_requirements_list
 
 
-def parse_setup_py(file_path: str) -> Generator[RequirementsEntry, None, None]:
+def parse_setup_py(
+    file_path: str, extras: List[str] = []
+) -> Generator[RequirementsEntry, None, None]:
     setup_kwargs = {}
 
     def _setup_proxy(*args, **kwargs):
@@ -26,7 +28,10 @@ def parse_setup_py(file_path: str) -> Generator[RequirementsEntry, None, None]:
     requirements = setup_kwargs.get("install_requires") or []
 
     extras_require = setup_kwargs.get("extras_require") or {}
-    for _, extra_requirements in extras_require.items():
+    for extra_name, extra_requirements in extras_require.items():
+        if extra_name not in extras:
+            continue
+
         requirements.extend(extra_requirements)
 
     for requirement in parse_requirements_list(source, requirements):

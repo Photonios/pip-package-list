@@ -50,6 +50,22 @@ def test_parse_requirements_editable_entry(path):
     )
 
 
+def test_parse_requirements_editable_entry_with_extras():
+    line = "-e ./mypackage[extra1, extra2]"
+
+    requirements = list(parse_requirements_list(source, [line]))
+    assert len(requirements) == 1
+
+    assert isinstance(requirements[0], RequirementsEditableEntry)
+    assert requirements[0].source.path == source.path
+    assert requirements[0].source.line == line
+    assert requirements[0].source.line_number == 1
+    assert requirements[0].absolute_path == os.path.realpath(
+        os.path.join(os.getcwd(), "./mypackage")
+    )
+    assert requirements[0].extras == ["extra1", "extra2"]
+
+
 @pytest.mark.parametrize("vcs", ["git", "hg"])
 @pytest.mark.parametrize(
     "uri", ["https://github.com/org/repo", "git@github.com:org/repo.git"]
@@ -122,6 +138,23 @@ def test_parse_requirements_package_entry_with_markers():
         requirements[0].markers
         == 'sys_platform == "linux" and python_version < "3.9"'
     )
+
+
+def test_parse_requirements_package_entry_with_extras():
+    line = "django[extra1, extra2]==1.2"
+
+    requirements = list(parse_requirements_list(source, [line]))
+    assert len(requirements) == 1
+
+    assert isinstance(requirements[0], RequirementsPackageEntry)
+    assert requirements[0].source.path == source.path
+    assert requirements[0].source.line == line
+    assert requirements[0].source.line_number == 1
+    assert requirements[0].name == "django"
+    assert requirements[0].extras == ["extra1", "extra2"]
+    assert requirements[0].version == "1.2"
+    assert requirements[0].operator == "=="
+    assert not requirements[0].markers
 
 
 def test_parse_requirements_wheel_package_entry():

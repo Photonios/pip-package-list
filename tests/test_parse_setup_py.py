@@ -28,8 +28,8 @@ def test_parse_setup_py():
 
 
 def test_parse_setup_py_with_extras():
-    requirements = list(parse_setup_py(setup_py_with_extras_path))
-    assert len(requirements) == 3
+    requirements = list(parse_setup_py(setup_py_with_extras_path, ["docs"]))
+    assert len(requirements) == 2
 
     assert isinstance(requirements[0], RequirementsPackageEntry)
     assert requirements[0].name == "django"
@@ -37,11 +37,6 @@ def test_parse_setup_py_with_extras():
     assert requirements[0].operator == "=="
 
     assert isinstance(requirements[1], RequirementsPackageEntry)
-    assert requirements[1].name == "pytest"
-    assert requirements[1].version == "2.0"
+    assert requirements[1].name == "Sphinx"
+    assert requirements[1].version == "1.0"
     assert requirements[1].operator == "=="
-
-    assert isinstance(requirements[2], RequirementsPackageEntry)
-    assert requirements[2].name == "Sphinx"
-    assert requirements[2].version == "1.0"
-    assert requirements[2].operator == "=="

@@ -39,7 +39,10 @@ def list_packages_from_files(
             elif isinstance(requirement, RequirementsEditableEntry):
                 if recurse_editable:
                     generators.append(
-                        parse_setup_py(requirement.resolved_absolute_path)
+                        parse_setup_py(
+                            requirement.resolved_absolute_path,
+                            requirement.extras,
+                        )
                     )
                 else:
                     yield requirement
