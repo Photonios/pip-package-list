@@ -4,6 +4,7 @@ import re
 from typing import Generator, List, Optional, Tuple
 
 from .entry import (
+    RequirementsDirectRefEntry,
     RequirementsEditableEntry,
     RequirementsEntry,
     RequirementsEntrySource,
@@ -49,6 +50,11 @@ def parse_requirements_list(
         elif re.match(r"^(.+)\+", requirement):
             yield parse_vcs_requirements_entry(
                 line_source, requirement, markers
+            )
+
+        elif "@" in requirement:
+            yield parse_direct_ref_requirements_entry(
+                line_source, requirement, markers,
             )
 
         elif requirement.endswith("whl"):
@@ -126,6 +132,18 @@ def parse_wheel_requirements_entry(
     source: RequirementsEntrySource, requirement, markers: Optional[str] = None,
 ) -> RequirementsWheelPackageEntry:
     return RequirementsWheelPackageEntry(source=source, uri=requirement)
+
+
+def parse_direct_ref_requirements_entry(
+    source: RequirementsEntrySource, requirement, markers: Optional[str] = None,
+) -> RequirementsDirectRefEntry:
+    name, uri = requirement.split("@")
+    name = name.strip()
+    uri = uri.strip()
+
+    return RequirementsDirectRefEntry(
+        source=source, name=name, uri=uri, markers=markers,
+    )
 
 
 def parse_package_requirements_entry(

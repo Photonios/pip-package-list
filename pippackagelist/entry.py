@@ -67,6 +67,20 @@ class RequirementsWheelPackageEntry(RequirementsEntry):
 
 
 @dataclass
+class RequirementsDirectRefEntry(RequirementsEntry):
+    name: str
+    uri: str
+    markers: Optional[str] = None
+
+    def __str__(self) -> str:
+        line = f"{self.name} @ {self.uri}"
+        if self.markers:
+            line += f" ; {self.markers}"
+
+        return line
+
+
+@dataclass
 class RequirementsPackageEntry(RequirementsEntry):
     name: str
     operator: Optional[str] = None

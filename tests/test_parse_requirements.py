@@ -3,6 +3,7 @@ import os
 import pytest
 
 from pippackagelist.entry import (
+    RequirementsDirectRefEntry,
     RequirementsEditableEntry,
     RequirementsEntrySource,
     RequirementsPackageEntry,
@@ -135,6 +136,36 @@ def test_parse_requirements_wheel_package_entry():
     assert requirements[0].source.line_number == 1
     assert requirements[0].uri == "https://mywebsite.com/mywheel.whl"
     assert not requirements[0].markers
+
+
+def test_parse_requirements_direct_ref_package_entry():
+    line = "mypackage @ https://website.com/mypackage.zip"
+
+    requirements = list(parse_requirements_list(source, [line]))
+    assert len(requirements) == 1
+
+    assert isinstance(requirements[0], RequirementsDirectRefEntry)
+    assert requirements[0].source.path == source.path
+    assert requirements[0].source.line == line
+    assert requirements[0].source.line_number == 1
+    assert requirements[0].name == "mypackage"
+    assert requirements[0].uri == "https://website.com/mypackage.zip"
+    assert not requirements[0].markers
+
+
+def test_parse_requirements_direct_ref_package_entry_with_markers():
+    line = 'mypackage @ https://website.com/mypackage.zip ; sys_platform == "win32"'
+
+    requirements = list(parse_requirements_list(source, [line]))
+    assert len(requirements) == 1
+
+    assert isinstance(requirements[0], RequirementsDirectRefEntry)
+    assert requirements[0].source.path == source.path
+    assert requirements[0].source.line == line
+    assert requirements[0].source.line_number == 1
+    assert requirements[0].name == "mypackage"
+    assert requirements[0].uri == "https://website.com/mypackage.zip"
+    assert requirements[0].markers == 'sys_platform == "win32"'
 
 
 def test_parse_requirements_skips_comments_and_blank_lines():
