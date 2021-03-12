@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from . import cli
+from .list_packages_from_files import list_packages_from_files
 
 
 def main() -> int:
@@ -62,7 +62,7 @@ def main() -> int:
 
     args = parser.parse_args()
 
-    requirements = cli.run(
+    requirements = list_packages_from_files(
         args.file_paths,
         recurse_recursive=args.recurse_recursive,
         recurse_editable=args.recurse_editable,
