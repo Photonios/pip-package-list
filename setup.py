@@ -58,7 +58,7 @@ setup(
         "console_scripts": ["pip-package-list=pippackagelist.__main__:main"]
     },
     python_requires=">=3.7",
-    install_requires=["setuptools==45.2.0"],
+    install_requires=["setuptools"],
     extras_require={
         "test": ["pytest==5.2.2", "pytest-cov==2.8.1",],
         "analysis": [
