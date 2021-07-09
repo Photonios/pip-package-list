@@ -1,0 +1,1 @@
+https://mywebsite.com/mypackage.whl#egg=mypackage

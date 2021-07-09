@@ -33,7 +33,13 @@ def main() -> int:
     parser.add_argument(
         "--remove-recursive",
         default=False,
-        help="remove recursive requirements from the final list",
+        help="remove recursive requirements (-r) from the final list",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--remove-constraints",
+        default=False,
+        help="remove constaints (-c) from the final list",
         action="store_true",
     )
     parser.add_argument(
@@ -74,6 +80,7 @@ def main() -> int:
         recurse_editable=args.recurse_editable,
         remove_editable=args.remove_editable,
         remove_recursive=args.remove_recursive,
+        remove_constraints=args.remove_constraints,
         remove_vcs=args.remove_vcs,
         remove_wheel=args.remove_wheel,
         remove_unversioned=args.remove_unversioned,

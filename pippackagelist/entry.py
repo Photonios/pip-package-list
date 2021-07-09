@@ -27,6 +27,16 @@ class RequirementsRecursiveEntry(RequirementsEntry):
 
 
 @dataclass
+class RequirementsConstraintsEntry(RequirementsEntry):
+    original_path: str
+    absolute_path: str
+
+    def __str__(self) -> str:
+        path = os.path.relpath(self.absolute_path, os.getcwd())
+        return f"-c {path}"
+
+
+@dataclass
 class RequirementsEditableEntry(RequirementsEntry):
     original_path: str
     absolute_path: str

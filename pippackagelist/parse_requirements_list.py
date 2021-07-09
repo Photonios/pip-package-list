@@ -4,6 +4,7 @@ import re
 from typing import Generator, List, Optional, Tuple
 
 from .entry import (
+    RequirementsConstraintsEntry,
     RequirementsDirectRefEntry,
     RequirementsEditableEntry,
     RequirementsEntry,
@@ -42,6 +43,11 @@ def parse_requirements_list(
 
         if requirement.startswith("-r"):
             yield parse_recursive_requirements_entry(
+                line_source, requirement, extras, markers
+            )
+
+        elif requirement.startswith("-c"):
+            yield parse_constraints_requirements_entry(
                 line_source, requirement, extras, markers
             )
 
@@ -88,6 +94,22 @@ def parse_recursive_requirements_entry(
     )
 
     return RequirementsRecursiveEntry(
+        source=source, original_path=original_path, absolute_path=absolute_path,
+    )
+
+
+def parse_constraints_requirements_entry(
+    source: RequirementsEntrySource,
+    requirement: str,
+    extras: List[str],
+    markers: Optional[str] = None,
+) -> RequirementsConstraintsEntry:
+    original_path = _clean_line(requirement.replace("-c", ""))
+    absolute_path = os.path.realpath(
+        os.path.join(os.path.dirname(source.path), original_path)
+    )
+
+    return RequirementsConstraintsEntry(
         source=source, original_path=original_path, absolute_path=absolute_path,
     )
 

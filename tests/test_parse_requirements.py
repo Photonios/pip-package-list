@@ -3,6 +3,7 @@ import os
 import pytest
 
 from pippackagelist.entry import (
+    RequirementsConstraintsEntry,
     RequirementsDirectRefEntry,
     RequirementsEditableEntry,
     RequirementsEntrySource,
@@ -27,6 +28,22 @@ def test_parse_requirements_recursive_entry(path):
     assert len(requirements) == 1
 
     assert isinstance(requirements[0], RequirementsRecursiveEntry)
+    assert requirements[0].source.path == source.path
+    assert requirements[0].source.line == line
+    assert requirements[0].source.line_number == 1
+    assert requirements[0].absolute_path == os.path.realpath(
+        os.path.join(os.getcwd(), path)
+    )
+
+
+@pytest.mark.parametrize("path", ["../bla.txt", "./bla.txt", "/test.txt"])
+def test_parse_requirements_constraints_entry(path):
+    line = "-c %s" % path
+
+    requirements = list(parse_requirements_list(source, [line]))
+    assert len(requirements) == 1
+
+    assert isinstance(requirements[0], RequirementsConstraintsEntry)
     assert requirements[0].source.path == source.path
     assert requirements[0].source.line == line
     assert requirements[0].source.line_number == 1

@@ -1,6 +1,7 @@
 from typing import Generator, List
 
 from .entry import (
+    RequirementsConstraintsEntry,
     RequirementsEditableEntry,
     RequirementsEntry,
     RequirementsIndexURLEntry,
@@ -24,6 +25,7 @@ def _list_packages_from_files(
     recurse_editable: bool = False,
     remove_editable: bool = False,
     remove_recursive: bool = False,
+    remove_constraints: bool = False,
     remove_vcs: bool = False,
     remove_wheel: bool = False,
     remove_unversioned: bool = False,
@@ -46,6 +48,9 @@ def _list_packages_from_files(
                         parse_requirements_txt(requirement.absolute_path)
                     )
                 elif not remove_recursive:
+                    yield requirement
+            elif isinstance(requirement, RequirementsConstraintsEntry):
+                if not remove_constraints:
                     yield requirement
             elif isinstance(requirement, RequirementsEditableEntry):
                 if recurse_editable:
@@ -82,6 +87,7 @@ def list_packages_from_files(
     recurse_editable: bool = False,
     remove_editable: bool = False,
     remove_recursive: bool = False,
+    remove_constraints: bool = False,
     remove_vcs: bool = False,
     remove_wheel: bool = False,
     remove_unversioned: bool = False,
@@ -94,6 +100,7 @@ def list_packages_from_files(
         recurse_editable=recurse_editable,
         remove_editable=remove_editable,
         remove_recursive=remove_recursive,
+        remove_constraints=remove_constraints,
         remove_vcs=remove_vcs,
         remove_wheel=remove_wheel,
         remove_unversioned=remove_unversioned,
