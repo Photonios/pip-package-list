@@ -79,10 +79,15 @@ class RequirementsVCSPackageEntry(RequirementsEntry):
 @dataclass
 class RequirementsWheelPackageEntry(RequirementsEntry):
     uri: str
+    name: Optional[str] = None
+
     markers: Optional[str] = None
 
     def __str__(self) -> str:
         line = self.uri
+        if self.name:
+            line += f"#egg={self.name}"
+
         if self.markers:
             line += f" ; {self.markers}"
 

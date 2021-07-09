@@ -71,7 +71,7 @@ def parse_requirements_list(
                 line_source, requirement, extras, markers,
             )
 
-        elif requirement.endswith("whl"):
+        elif re.match(r"^(http|https|file)://(.+).whl", requirement):
             yield parse_wheel_requirements_entry(
                 line_source, requirement, extras, markers
             )
@@ -178,7 +178,15 @@ def parse_wheel_requirements_entry(
     extras: List[str],
     markers: Optional[str] = None,
 ) -> RequirementsWheelPackageEntry:
-    return RequirementsWheelPackageEntry(source=source, uri=requirement)
+    uri = requirement
+    name = None
+
+    if "#egg=" in requirement:
+        uri, name = requirement.split("#egg=")
+
+    return RequirementsWheelPackageEntry(
+        source=source, uri=uri, name=name, markers=markers
+    )
 
 
 def parse_direct_ref_requirements_entry(

@@ -186,7 +186,23 @@ def test_parse_requirements_wheel_package_entry():
     assert requirements[0].source.line == line
     assert requirements[0].source.line_number == 1
     assert requirements[0].uri == "https://mywebsite.com/mywheel.whl"
+    assert not requirements[0].name
     assert not requirements[0].markers
+
+
+def test_parse_requirements_wheel_package_entry_with_name():
+    line = 'https://mywebsite.com/mywheel.whl#egg=mypackage ; sys_platform == "linux"'
+
+    requirements = list(parse_requirements_list(source, [line]))
+    assert len(requirements) == 1
+
+    assert isinstance(requirements[0], RequirementsWheelPackageEntry)
+    assert requirements[0].source.path == source.path
+    assert requirements[0].source.line == line
+    assert requirements[0].source.line_number == 1
+    assert requirements[0].uri == "https://mywebsite.com/mywheel.whl"
+    assert requirements[0].name == "mypackage"
+    assert requirements[0].markers == 'sys_platform == "linux"'
 
 
 def test_parse_requirements_direct_ref_package_entry():
