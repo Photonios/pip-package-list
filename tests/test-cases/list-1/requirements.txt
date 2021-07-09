@@ -1,5 +1,5 @@
 -e package-1[local,special]
-django==1.1
+django==2.2.24
 # comment weeeeh
 
 redis==2.0
