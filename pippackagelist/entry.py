@@ -45,6 +45,14 @@ class RequirementsEditableEntry(RequirementsEntry):
 
 
 @dataclass
+class RequirementsIndexURLEntry(RequirementsEntry):
+    url: str
+
+    def __str__(self) -> str:
+        return f"-i {self.url}"
+
+
+@dataclass
 class RequirementsVCSPackageEntry(RequirementsEntry):
     vcs: str
     uri: str

@@ -5,3 +5,5 @@ django==1.1
 redis==2.0
 
 -r requirements-nested.txt
+
+-i https://mypackages.com/repo

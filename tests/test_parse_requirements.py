@@ -6,6 +6,7 @@ from pippackagelist.entry import (
     RequirementsDirectRefEntry,
     RequirementsEditableEntry,
     RequirementsEntrySource,
+    RequirementsIndexURLEntry,
     RequirementsPackageEntry,
     RequirementsRecursiveEntry,
     RequirementsVCSPackageEntry,
@@ -199,6 +200,19 @@ def test_parse_requirements_direct_ref_package_entry_with_markers():
     assert requirements[0].name == "mypackage"
     assert requirements[0].uri == "https://website.com/mypackage.zip"
     assert requirements[0].markers == 'sys_platform == "win32"'
+
+
+def test_parse_requirements_index_url():
+    line = "-i https://mypackages.com/repo/pypi"
+
+    requirements = list(parse_requirements_list(source, [line]))
+    assert len(requirements) == 1
+
+    assert isinstance(requirements[0], RequirementsIndexURLEntry)
+    assert requirements[0].source.path == source.path
+    assert requirements[0].source.line == line
+    assert requirements[0].source.line_number == 1
+    assert requirements[0].url == "https://mypackages.com/repo/pypi"
 
 
 def test_parse_requirements_skips_comments_and_blank_lines():

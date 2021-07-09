@@ -18,6 +18,7 @@ def test_list_packages_from_files_from_requirements():
         "django==1.1",
         "redis==2.0",
         "-r tests/test-cases/list-1/requirements-nested.txt",
+        "-i https://mypackages.com/repo",
     ]
 
 
@@ -35,6 +36,7 @@ def test_list_packages_from_files_from_requirements_recurse_recursive():
         "-e tests/test-cases/list-1/package-1[local,special]",
         "django==1.1",
         "redis==2.0",
+        "-i https://mypackages.com/repo",
         "test>=1.2",
         "-e tests/test-cases/list-1/package-2",
     ]
@@ -54,6 +56,7 @@ def test_list_packages_from_files_from_requirements_recurse_editable():
         "django==1.1",
         "redis==2.0",
         "-r tests/test-cases/list-1/requirements-nested.txt",
+        "-i https://mypackages.com/repo",
         "pyyaml>=2.1",
         "grpcio==9.1",
         "mypackage",

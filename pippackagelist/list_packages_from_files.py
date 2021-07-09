@@ -3,6 +3,7 @@ from typing import Generator, List
 from .entry import (
     RequirementsEditableEntry,
     RequirementsEntry,
+    RequirementsIndexURLEntry,
     RequirementsPackageEntry,
     RequirementsRecursiveEntry,
     RequirementsVCSPackageEntry,
@@ -26,6 +27,7 @@ def _list_packages_from_files(
     remove_vcs: bool = False,
     remove_wheel: bool = False,
     remove_unversioned: bool = False,
+    remove_index_urls: bool = False,
 ) -> Generator[RequirementsEntry, None, None]:
     generators = []
 
@@ -55,6 +57,9 @@ def _list_packages_from_files(
                     )
                 elif not remove_editable:
                     yield requirement
+            elif isinstance(requirement, RequirementsIndexURLEntry):
+                if not remove_index_urls:
+                    yield requirement
             elif isinstance(requirement, RequirementsVCSPackageEntry):
                 if not remove_vcs:
                     yield requirement
@@ -80,6 +85,7 @@ def list_packages_from_files(
     remove_vcs: bool = False,
     remove_wheel: bool = False,
     remove_unversioned: bool = False,
+    remove_index_urls: bool = False,
     dedupe: bool = False,
 ) -> Generator[RequirementsEntry, None, None]:
     generator = _list_packages_from_files(
@@ -91,6 +97,7 @@ def list_packages_from_files(
         remove_vcs=remove_vcs,
         remove_wheel=remove_wheel,
         remove_unversioned=remove_unversioned,
+        remove_index_urls=remove_index_urls,
     )
 
     if not dedupe:

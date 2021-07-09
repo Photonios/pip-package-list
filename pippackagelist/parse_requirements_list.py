@@ -8,6 +8,7 @@ from .entry import (
     RequirementsEditableEntry,
     RequirementsEntry,
     RequirementsEntrySource,
+    RequirementsIndexURLEntry,
     RequirementsPackageEntry,
     RequirementsRecursiveEntry,
     RequirementsVCSPackageEntry,
@@ -46,6 +47,11 @@ def parse_requirements_list(
 
         elif requirement.startswith("-e"):
             yield parse_editable_requirements_entry(
+                line_source, requirement, extras, markers
+            )
+
+        elif requirement.startswith("-i"):
+            yield parse_index_url_requirements_entry(
                 line_source, requirement, extras, markers
             )
 
@@ -113,6 +119,16 @@ def parse_editable_requirements_entry(
         resolved_absolute_path=resolved_absolute_path,
         extras=extras,
     )
+
+
+def parse_index_url_requirements_entry(
+    source: RequirementsEntrySource,
+    requirement: str,
+    extras: List[str],
+    markers: Optional[str] = None,
+) -> RequirementsIndexURLEntry:
+    url = _clean_line(requirement.replace("-i", ""))
+    return RequirementsIndexURLEntry(source=source, url=url)
 
 
 def parse_vcs_requirements_entry(

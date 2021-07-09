@@ -55,6 +55,12 @@ def main() -> int:
         action="store_true",
     )
     parser.add_argument(
+        "--remove-index-urls",
+        default=False,
+        help="remove -i entries (index urls) from the final list",
+        action="store_true",
+    )
+    parser.add_argument(
         "file_paths",
         nargs="+",
         help="list of requirements.txt or setup.py files",
@@ -71,6 +77,7 @@ def main() -> int:
         remove_vcs=args.remove_vcs,
         remove_wheel=args.remove_wheel,
         remove_unversioned=args.remove_unversioned,
+        remove_index_urls=args.remove_index_urls,
         dedupe=args.dedupe,
     )
 
