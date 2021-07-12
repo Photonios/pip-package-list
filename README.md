@@ -12,6 +12,27 @@ Although there is a number of tools that parse and resolve requirement files, I 
 
 ## Usage
 
-    pip-package-list [requirements.txt or setup.py file...]
+    usage: pip-package-list [-h] [--recurse-recursive] [--recurse-editable]
+                            [--inline-constraints] [--dedupe] [--remove-editable]
+                            [--remove-recursive] [--remove-constraints]
+                            [--remove-vcs] [--remove-wheel] [--remove-unversioned]
+                            [--remove-index-urls]
+                            file_paths [file_paths ...]
 
-You can specify one or more `requirements.txt` or `setup.py` files to be parsed and resolved.
+    positional arguments:
+      file_paths            list of requirements.txt or setup.py files
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      --recurse-recursive   recurse into -r entries
+      --recurse-editable    recurse into -e entries
+      --inline-constraints  recurse into -c entries and inline them
+      --dedupe              de-duplicate the resulting list
+      --remove-editable     remove editable requirements from the final list
+      --remove-recursive    remove recursive requirements (-r) from the final list
+      --remove-constraints  remove constaints (-c) from the final list
+      --remove-vcs          remove vcs requirements from the final list
+      --remove-wheel        remove wheel requirements from the final list
+      --remove-unversioned  remove requirements without a version number from the
+                            final list
+      --remove-index-urls   remove -i entries (index urls) from the final list
