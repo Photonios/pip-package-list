@@ -72,6 +72,9 @@ class RequirementsVCSPackageEntry(RequirementsEntry):
     tag: Optional[str] = None
     name: Optional[str] = None
 
+    def package_name(self) -> Optional[str]:
+        return self.name
+
     def __str__(self) -> str:
         result = f"{self.vcs}+{self.uri}"
         if self.tag:

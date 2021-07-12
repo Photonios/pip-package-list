@@ -193,7 +193,7 @@ def parse_vcs_requirements_entry(
 
     tag = None
 
-    repo_name_index = uri.rindex(":")
+    repo_name_index = uri.rfind(":")
     if repo_name_index >= 0:
         repo_name = uri[repo_name_index:]
         if "@" in repo_name:

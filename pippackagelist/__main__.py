@@ -19,6 +19,12 @@ def main() -> int:
         action="store_true",
     )
     parser.add_argument(
+        "--inline-constraints",
+        default=False,
+        help="recurse into -c entries and inline them",
+        action="store_true",
+    )
+    parser.add_argument(
         "--dedupe",
         default=False,
         help="de-duplicate the resulting list",
@@ -78,6 +84,7 @@ def main() -> int:
         args.file_paths,
         recurse_recursive=args.recurse_recursive,
         recurse_editable=args.recurse_editable,
+        inline_constraints=args.inline_constraints,
         remove_editable=args.remove_editable,
         remove_recursive=args.remove_recursive,
         remove_constraints=args.remove_constraints,
