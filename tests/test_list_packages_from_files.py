@@ -68,3 +68,23 @@ def test_list_packages_from_files_from_requirements_recurse_editable():
         "mypackage",
         "specialpackage",
     ]
+
+
+def test_list_packages_from_files_from_requirements_inline_constraints():
+    path = os.path.join(test_case_1_path, "requirements.txt")
+
+    raw_requirements = [
+        str(requirement)
+        for requirement in list_packages_from_files(
+            [path], inline_constraints=True
+        )
+    ]
+    assert raw_requirements == [
+        "-e tests/test-cases/list-1/package-1[local,special]",
+        'https://myindex.com/pypi/django-2.0-macos.whl#egg=django ; sys_platform == "darwin"',
+        'https://myindex.com/pypi/django-2.0-linux.whl#egg=django ; sys_platform == "linux"',
+        "redis==2.0",
+        "-r tests/test-cases/list-1/requirements-nested.txt",
+        "-i https://mypackages.com/repo",
+        "mypackage==4.2.1",
+    ]
