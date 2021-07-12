@@ -7,13 +7,16 @@ from typing import List, Optional
 @dataclass
 class RequirementsEntrySource:
     path: str
-    line: Optional[str]
-    line_number: Optional[str]
+    line: Optional[str] = None
+    line_number: Optional[str] = None
 
 
 @dataclass
 class RequirementsEntry:
     source: Optional[RequirementsEntrySource]
+
+    def package_name(self) -> Optional[str]:
+        return None
 
 
 @dataclass
@@ -66,12 +69,16 @@ class RequirementsIndexURLEntry(RequirementsEntry):
 class RequirementsVCSPackageEntry(RequirementsEntry):
     vcs: str
     uri: str
-    tag: Optional[str]
+    tag: Optional[str] = None
+    name: Optional[str] = None
 
     def __str__(self) -> str:
         result = f"{self.vcs}+{self.uri}"
         if self.tag:
-            result += f"#{self.tag}"
+            result += f"@{self.tag}"
+
+        if self.name:
+            result += f"#egg={self.name}"
 
         return result
 
@@ -82,6 +89,9 @@ class RequirementsWheelPackageEntry(RequirementsEntry):
     name: Optional[str] = None
 
     markers: Optional[str] = None
+
+    def package_name(self) -> Optional[str]:
+        return self.name
 
     def __str__(self) -> str:
         line = self.uri
@@ -98,7 +108,11 @@ class RequirementsWheelPackageEntry(RequirementsEntry):
 class RequirementsDirectRefEntry(RequirementsEntry):
     name: str
     uri: str
+
     markers: Optional[str] = None
+
+    def package_name(self) -> Optional[str]:
+        return self.name
 
     def __str__(self) -> str:
         line = f"{self.name} @ {self.uri}"
@@ -114,7 +128,11 @@ class RequirementsPackageEntry(RequirementsEntry):
     extras: List[str] = field(default_factory=list)
     operator: Optional[str] = None
     version: Optional[str] = None
+
     markers: Optional[str] = None
+
+    def package_name(self) -> Optional[str]:
+        return self.name
 
     def __str__(self) -> str:
         line = self.name

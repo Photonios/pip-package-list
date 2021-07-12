@@ -89,10 +89,15 @@ def test_parse_requirements_editable_entry_with_extras():
     "uri", ["https://github.com/org/repo", "git@github.com:org/repo.git"]
 )
 @pytest.mark.parametrize("tag", ["test", "1234", None])
-def test_parse_requirements_vcs_package_entry(vcs, uri, tag):
+@pytest.mark.parametrize("name", ["mypackage", "mypackage123", None])
+def test_parse_requirements_vcs_package_entry(vcs, uri, tag, name):
     line = f"{vcs}+{uri}"
+
     if tag:
-        line += f"#{tag}"
+        line += f"@{tag}"
+
+    if name:
+        line += f"#egg={name}"
 
     requirements = list(parse_requirements_list(source, [line]))
     assert len(requirements) == 1
@@ -104,6 +109,7 @@ def test_parse_requirements_vcs_package_entry(vcs, uri, tag):
     assert requirements[0].vcs == vcs
     assert requirements[0].uri == uri
     assert requirements[0].tag == tag
+    assert requirements[0].name == name
 
 
 @pytest.mark.parametrize("operator", ["==", ">=", ">", "<=", "<"])
@@ -267,7 +273,7 @@ def test_parse_requirements_ignores_leading_and_trailing_whitespace():
         "   django==1.0   ",
         "  -r    ./otherfile.txt  ",
         " -e ../",
-        "    git+https://github.com/test/test#tag",
+        "    git+https://github.com/test/test@tag",
     ]
 
     requirements = list(parse_requirements_list(source, lines))
@@ -302,7 +308,7 @@ def test_parse_requirements_ignores_leading_and_trailing_whitespace():
 
     assert isinstance(requirements[3], RequirementsVCSPackageEntry)
     assert requirements[3].source.path == source.path
-    assert requirements[3].source.line == "git+https://github.com/test/test#tag"
+    assert requirements[3].source.line == "git+https://github.com/test/test@tag"
     assert requirements[3].source.line_number == 4
     assert requirements[3].vcs == "git"
     assert requirements[3].uri == "https://github.com/test/test"

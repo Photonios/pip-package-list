@@ -2,6 +2,7 @@ import os
 import re
 
 from typing import Generator, List, Optional, Tuple
+from urllib.parse import urlparse
 
 from .entry import (
     RequirementsConstraintsEntry,
@@ -159,17 +160,48 @@ def parse_vcs_requirements_entry(
     extras: List[str],
     markers: Optional[str] = None,
 ) -> RequirementsVCSPackageEntry:
-    vcs_uri_split = requirement.split("+")
-    vcs = vcs_uri_split[0]
+    vcs, uri = requirement.split("+", maxsplit=1)
 
-    uri_tag_split = vcs_uri_split[1].split("#")
-    uri = uri_tag_split[0]
+    # If this looks like a normal URL, let's use urlparse. We need to do this
+    # so we can tell the username and tag apart, which both use '@'
+    match = re.match(r"^(.+)://", uri)
+    if match:
+        uri_parts = urlparse(uri)
+
+        name = None
+        if "egg=" in uri_parts.fragment:
+            name = uri_parts.fragment.replace("egg=", "")
+            uri_parts = uri_parts._replace(
+                fragment=uri_parts.fragment.replace(f"egg={name}", "")
+            )
+
+        tag = None
+        if "@" in uri_parts.path:
+            path, tag = uri_parts.path.split("@", maxsplit=1)
+            uri_parts = uri_parts._replace(path=path)
+
+        uri = uri_parts.geturl()
+
+        return RequirementsVCSPackageEntry(
+            source=source, vcs=vcs, uri=uri, tag=tag, name=name
+        )
+
+    # We're dealing with a Git SSH uri: git@github.com:/repo.git@tag@egg=name
+    name = None
+    if "#egg=" in uri:
+        uri, name = uri.split("#egg=", maxsplit=1)
 
     tag = None
-    if len(uri_tag_split) > 1:
-        tag = uri_tag_split[1]
 
-    return RequirementsVCSPackageEntry(source=source, vcs=vcs, uri=uri, tag=tag)
+    repo_name_index = uri.rindex(":")
+    if repo_name_index >= 0:
+        repo_name = uri[repo_name_index:]
+        if "@" in repo_name:
+            uri, tag = uri.rsplit("@", maxsplit=1)
+
+    return RequirementsVCSPackageEntry(
+        source=source, vcs=vcs, uri=uri, tag=tag, name=name
+    )
 
 
 def parse_wheel_requirements_entry(
