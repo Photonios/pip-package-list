@@ -89,7 +89,7 @@ def parse_recursive_requirements_entry(
     extras: List[str],
     markers: Optional[str] = None,
 ) -> RequirementsRecursiveEntry:
-    original_path = _clean_line(requirement.replace("-r", ""))
+    original_path = _clean_line(requirement.lstrip("-r"))
     absolute_path = os.path.realpath(
         os.path.join(os.path.dirname(source.path), original_path)
     )
@@ -105,7 +105,7 @@ def parse_constraints_requirements_entry(
     extras: List[str],
     markers: Optional[str] = None,
 ) -> RequirementsConstraintsEntry:
-    original_path = _clean_line(requirement.replace("-c", ""))
+    original_path = _clean_line(requirement.lstrip("-c"))
     absolute_path = os.path.realpath(
         os.path.join(os.path.dirname(source.path), original_path)
     )
@@ -121,7 +121,7 @@ def parse_editable_requirements_entry(
     extras: List[str],
     markers: Optional[str] = None,
 ) -> RequirementsEditableEntry:
-    original_path = _clean_line(requirement.replace("-e", ""))
+    original_path = _clean_line(requirement.lstrip("-e"))
     resolved_path = original_path
 
     if not original_path.endswith(".py"):
@@ -150,7 +150,7 @@ def parse_index_url_requirements_entry(
     extras: List[str],
     markers: Optional[str] = None,
 ) -> RequirementsIndexURLEntry:
-    url = _clean_line(requirement.replace("-i", ""))
+    url = _clean_line(requirement.lstrip("-i"))
     return RequirementsIndexURLEntry(source=source, url=url)
 
 

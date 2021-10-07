@@ -20,7 +20,9 @@ source = RequirementsEntrySource(
 )
 
 
-@pytest.mark.parametrize("path", ["../bla.txt", "./bla.txt", "/test.txt"])
+@pytest.mark.parametrize(
+    "path", ["../bla.txt", "./bla.txt", "/test.txt", "../bla-r.txt"]
+)
 def test_parse_requirements_recursive_entry(path):
     line = "-r %s" % path
 
@@ -36,7 +38,9 @@ def test_parse_requirements_recursive_entry(path):
     )
 
 
-@pytest.mark.parametrize("path", ["../bla.txt", "./bla.txt", "/test.txt"])
+@pytest.mark.parametrize(
+    "path", ["../bla.txt", "./bla.txt", "/test.txt", "../bla-c.txt"]
+)
 def test_parse_requirements_constraints_entry(path):
     line = "-c %s" % path
 
@@ -52,7 +56,9 @@ def test_parse_requirements_constraints_entry(path):
     )
 
 
-@pytest.mark.parametrize("path", ["../bla", "./bla", "/mypackage", "."])
+@pytest.mark.parametrize(
+    "path", ["../bla", "./bla", "/mypackage", ".", "../bla-e.txt"]
+)
 def test_parse_requirements_editable_entry(path):
     line = "-e %s" % path
 
