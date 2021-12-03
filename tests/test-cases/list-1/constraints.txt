@@ -1,2 +1,3 @@
 https://myindex.com/pypi/django-2.0-macos.whl#egg=django ; sys_platform == "darwin"
 https://myindex.com/pypi/django-2.0-linux.whl#egg=django ; sys_platform == "linux"
+Pillow==8.2.0+sl.1

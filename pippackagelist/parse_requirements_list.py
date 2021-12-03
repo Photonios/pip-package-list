@@ -17,6 +17,36 @@ from .entry import (
     RequirementsWheelPackageEntry,
 )
 
+# From: https://pip.pypa.io/en/stable/topics/vcs-support/#supported-vcs
+vcs_protocols = [
+    "git+file",
+    "git+https",
+    "git+ssh",
+    "git+http",
+    "git+git",
+    "git+",
+    "hg+",
+    "hg+file",
+    "hg+http",
+    "hg+https",
+    "hg+ssh",
+    "hg+static-http",
+    "svn+",
+    "svn+svn",
+    "svn+http",
+    "svn+https",
+    "svn+ssh",
+    "bzr+http",
+    "bzr+https",
+    "bzr+ssh",
+    "bzr+sftp",
+    "bzr+ftp",
+    "bzr+lp",
+]
+vcs_protocols_regex = r"^(%s)" % "|".join(
+    [re.escape(protocol) for protocol in vcs_protocols]
+)
+
 
 class RequirementsEntryParseError(RuntimeError):
     pass
@@ -62,7 +92,7 @@ def parse_requirements_list(
                 line_source, requirement, extras, markers
             )
 
-        elif re.match(r"^(.+)\+", requirement):
+        elif re.match(vcs_protocols_regex, requirement):
             yield parse_vcs_requirements_entry(
                 line_source, requirement, extras, markers
             )
