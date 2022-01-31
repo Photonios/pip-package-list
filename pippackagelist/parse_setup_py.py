@@ -19,7 +19,7 @@ def parse_setup_py(
     setuptools.setup = _setup_proxy
 
     with open(file_path, "r") as fp:
-        exec(fp.read())
+        exec(fp.read(), globals())
 
     source = RequirementsEntrySource(
         path=os.path.realpath(file_path), line=None, line_number=None
