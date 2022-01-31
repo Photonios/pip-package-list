@@ -30,7 +30,7 @@ Although there is a number of tools that parse and resolve requirement files, I 
       --dedupe              de-duplicate the resulting list
       --remove-editable     remove editable requirements from the final list
       --remove-recursive    remove recursive requirements (-r) from the final list
-      --remove-constraints  remove constaints (-c) from the final list
+      --remove-constraints  remove constraints (-c) from the final list
       --remove-vcs          remove vcs requirements from the final list
       --remove-wheel        remove wheel requirements from the final list
       --remove-unversioned  remove requirements without a version number from the
