@@ -7,6 +7,7 @@ from .entry import (
     RequirementsEntry,
     RequirementsIndexURLEntry,
     RequirementsPackageEntry,
+    RequirementsPathPackageEntry,
     RequirementsRecursiveEntry,
     RequirementsVCSPackageEntry,
     RequirementsWheelPackageEntry,
@@ -25,10 +26,12 @@ def _list_packages_from_files(
     *,
     recurse_recursive: bool = False,
     recurse_editable: bool = False,
+    recurse_path: bool = False,
     remove_editable: bool = False,
     remove_recursive: bool = False,
     remove_constraints: bool = False,
     remove_vcs: bool = False,
+    remove_path: bool = False,
     remove_wheel: bool = False,
     remove_unversioned: bool = False,
     remove_index_urls: bool = False,
@@ -70,6 +73,16 @@ def _list_packages_from_files(
             elif isinstance(requirement, RequirementsVCSPackageEntry):
                 if not remove_vcs:
                     yield requirement
+            elif isinstance(requirement, RequirementsPathPackageEntry):
+                if recurse_path:
+                    generators.append(
+                        parse_setup_py(
+                            requirement.resolved_absolute_path,
+                            requirement.extras,
+                        )
+                    )
+                elif not remove_path:
+                    yield requirement
             elif isinstance(requirement, RequirementsWheelPackageEntry):
                 if not remove_wheel:
                     yield requirement
@@ -78,6 +91,8 @@ def _list_packages_from_files(
                     continue
                 else:
                     yield requirement
+            else:
+                yield requirement
 
         generators = generators[1:]
 
@@ -157,11 +172,13 @@ def list_packages_from_files(
     *,
     recurse_recursive: bool = False,
     recurse_editable: bool = False,
+    recurse_path: bool = False,
     inline_constraints: bool = False,
     remove_editable: bool = False,
     remove_recursive: bool = False,
     remove_constraints: bool = False,
     remove_vcs: bool = False,
+    remove_path: bool = False,
     remove_wheel: bool = False,
     remove_unversioned: bool = False,
     remove_index_urls: bool = False,
@@ -171,10 +188,12 @@ def list_packages_from_files(
         file_paths,
         recurse_recursive=recurse_recursive,
         recurse_editable=recurse_editable,
+        recurse_path=recurse_path,
         remove_editable=remove_editable,
         remove_recursive=remove_recursive,
         remove_constraints=remove_constraints,
         remove_vcs=remove_vcs,
+        remove_path=remove_path,
         remove_wheel=remove_wheel,
         remove_unversioned=remove_unversioned,
         remove_index_urls=remove_index_urls,

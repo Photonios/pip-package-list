@@ -12,6 +12,7 @@ from .entry import (
     RequirementsEntrySource,
     RequirementsIndexURLEntry,
     RequirementsPackageEntry,
+    RequirementsPathPackageEntry,
     RequirementsRecursiveEntry,
     RequirementsVCSPackageEntry,
     RequirementsWheelPackageEntry,
@@ -84,6 +85,11 @@ def parse_requirements_list(
 
         elif requirement.startswith("-e"):
             yield parse_editable_requirements_entry(
+                line_source, requirement, extras, markers
+            )
+
+        elif requirement.startswith("./"):
+            yield parse_path_requirements_entry(
                 line_source, requirement, extras, markers
             )
 
@@ -165,6 +171,35 @@ def parse_editable_requirements_entry(
     )
 
     return RequirementsEditableEntry(
+        source=source,
+        original_path=original_path,
+        absolute_path=absolute_path,
+        resolved_path=resolved_path,
+        resolved_absolute_path=resolved_absolute_path,
+        extras=extras,
+    )
+
+
+def parse_path_requirements_entry(
+    source: RequirementsEntrySource,
+    requirement: str,
+    extras: List[str],
+    markers: Optional[str] = None,
+) -> RequirementsEditableEntry:
+    original_path = _clean_line(requirement)
+    resolved_path = original_path
+
+    if not original_path.endswith(".py"):
+        resolved_path = os.path.join(original_path, "setup.py")
+
+    absolute_path = os.path.realpath(
+        os.path.join(os.path.dirname(source.path), original_path)
+    )
+    resolved_absolute_path = os.path.realpath(
+        os.path.join(os.path.dirname(source.path), resolved_path)
+    )
+
+    return RequirementsPathPackageEntry(
         source=source,
         original_path=original_path,
         absolute_path=absolute_path,

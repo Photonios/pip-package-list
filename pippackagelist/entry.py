@@ -87,6 +87,24 @@ class RequirementsVCSPackageEntry(RequirementsEntry):
 
 
 @dataclass
+class RequirementsPathPackageEntry(RequirementsEntry):
+    original_path: str
+    absolute_path: str
+
+    resolved_path: str
+    resolved_absolute_path: str
+
+    extras: List[str] = field(default_factory=list)
+
+    def __str__(self) -> str:
+        line = os.path.relpath(self.absolute_path, os.getcwd())
+        if self.extras:
+            line += "[" + ",".join(self.extras) + "]"
+
+        return f"{line}"
+
+
+@dataclass
 class RequirementsWheelPackageEntry(RequirementsEntry):
     uri: str
     name: Optional[str] = None

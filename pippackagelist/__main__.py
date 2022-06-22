@@ -19,6 +19,12 @@ def main() -> int:
         action="store_true",
     )
     parser.add_argument(
+        "--recurse-path",
+        default=False,
+        help="recurse into local path entries",
+        action="store_true",
+    )
+    parser.add_argument(
         "--inline-constraints",
         default=False,
         help="recurse into -c entries and inline them",
@@ -34,6 +40,12 @@ def main() -> int:
         "--remove-editable",
         default=False,
         help="remove editable requirements from the final list",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--remove-path",
+        default=False,
+        help="remove path requirements from the final list",
         action="store_true",
     )
     parser.add_argument(
@@ -84,11 +96,13 @@ def main() -> int:
         args.file_paths,
         recurse_recursive=args.recurse_recursive,
         recurse_editable=args.recurse_editable,
+        recurse_path=args.recurse_path,
         inline_constraints=args.inline_constraints,
         remove_editable=args.remove_editable,
         remove_recursive=args.remove_recursive,
         remove_constraints=args.remove_constraints,
         remove_vcs=args.remove_vcs,
+        remove_path=args.remove_path,
         remove_wheel=args.remove_wheel,
         remove_unversioned=args.remove_unversioned,
         remove_index_urls=args.remove_index_urls,
