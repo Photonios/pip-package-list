@@ -69,53 +69,53 @@ def parse_requirements_list(
                 path=source.path, line=stripped_line, line_number=index + 1
             )
 
-        requirement, extras, markers = _split_requirement_and_markers(
+        requirement, extras, markers, options = _split_requirement_and_markers(
             stripped_line
         )
 
         if requirement.startswith("-r"):
             yield parse_recursive_requirements_entry(
-                line_source, requirement, extras, markers
+                line_source, requirement, extras, markers, options,
             )
 
         elif requirement.startswith("-c"):
             yield parse_constraints_requirements_entry(
-                line_source, requirement, extras, markers
+                line_source, requirement, extras, markers, options,
             )
 
         elif requirement.startswith("-e"):
             yield parse_editable_requirements_entry(
-                line_source, requirement, extras, markers
+                line_source, requirement, extras, markers, options,
             )
 
         elif requirement.startswith("./"):
             yield parse_path_requirements_entry(
-                line_source, requirement, extras, markers
+                line_source, requirement, extras, markers, options,
             )
 
         elif requirement.startswith("-i"):
             yield parse_index_url_requirements_entry(
-                line_source, requirement, extras, markers
+                line_source, requirement, extras, markers, options
             )
 
         elif re.match(vcs_protocols_regex, requirement):
             yield parse_vcs_requirements_entry(
-                line_source, requirement, extras, markers
+                line_source, requirement, extras, markers, options
             )
 
         elif "@" in requirement:
             yield parse_direct_ref_requirements_entry(
-                line_source, requirement, extras, markers,
+                line_source, requirement, extras, markers, options,
             )
 
         elif re.match(r"^(http|https|file)://(.+).whl", requirement):
             yield parse_wheel_requirements_entry(
-                line_source, requirement, extras, markers
+                line_source, requirement, extras, markers, options,
             )
 
         else:
             yield parse_package_requirements_entry(
-                line_source, requirement, extras, markers
+                line_source, requirement, extras, markers, options
             )
 
 
@@ -124,6 +124,7 @@ def parse_recursive_requirements_entry(
     requirement: str,
     extras: List[str],
     markers: Optional[str] = None,
+    options: Optional[str] = None,
 ) -> RequirementsRecursiveEntry:
     original_path = _clean_line(requirement.lstrip("-r"))
     absolute_path = os.path.realpath(
@@ -140,6 +141,7 @@ def parse_constraints_requirements_entry(
     requirement: str,
     extras: List[str],
     markers: Optional[str] = None,
+    options: Optional[str] = None,
 ) -> RequirementsConstraintsEntry:
     original_path = _clean_line(requirement.lstrip("-c"))
     absolute_path = os.path.realpath(
@@ -156,6 +158,7 @@ def parse_editable_requirements_entry(
     requirement: str,
     extras: List[str],
     markers: Optional[str] = None,
+    options: Optional[str] = None,
 ) -> RequirementsEditableEntry:
     original_path = _clean_line(requirement.lstrip("-e"))
     resolved_path = original_path
@@ -177,6 +180,7 @@ def parse_editable_requirements_entry(
         resolved_path=resolved_path,
         resolved_absolute_path=resolved_absolute_path,
         extras=extras,
+        options=options,
     )
 
 
@@ -185,6 +189,7 @@ def parse_path_requirements_entry(
     requirement: str,
     extras: List[str],
     markers: Optional[str] = None,
+    options: Optional[str] = None,
 ) -> RequirementsEditableEntry:
     original_path = _clean_line(requirement)
     resolved_path = original_path
@@ -201,6 +206,7 @@ def parse_path_requirements_entry(
 
     return RequirementsPathPackageEntry(
         source=source,
+        options=options,
         original_path=original_path,
         absolute_path=absolute_path,
         resolved_path=resolved_path,
@@ -214,6 +220,7 @@ def parse_index_url_requirements_entry(
     requirement: str,
     extras: List[str],
     markers: Optional[str] = None,
+    options: Optional[str] = None,
 ) -> RequirementsIndexURLEntry:
     url = _clean_line(requirement.lstrip("-i"))
     return RequirementsIndexURLEntry(source=source, url=url)
@@ -224,6 +231,7 @@ def parse_vcs_requirements_entry(
     requirement: str,
     extras: List[str],
     markers: Optional[str] = None,
+    options: Optional[str] = None,
 ) -> RequirementsVCSPackageEntry:
     vcs, uri = requirement.split("+", maxsplit=1)
 
@@ -248,7 +256,12 @@ def parse_vcs_requirements_entry(
         uri = uri_parts.geturl()
 
         return RequirementsVCSPackageEntry(
-            source=source, vcs=vcs, uri=uri, tag=tag, name=name
+            source=source,
+            vcs=vcs,
+            uri=uri,
+            tag=tag,
+            name=name,
+            options=options,
         )
 
     # We're dealing with a Git SSH uri: git@github.com:/repo.git@tag@egg=name
@@ -265,7 +278,7 @@ def parse_vcs_requirements_entry(
             uri, tag = uri.rsplit("@", maxsplit=1)
 
     return RequirementsVCSPackageEntry(
-        source=source, vcs=vcs, uri=uri, tag=tag, name=name
+        source=source, vcs=vcs, uri=uri, tag=tag, name=name, options=options,
     )
 
 
@@ -274,6 +287,7 @@ def parse_wheel_requirements_entry(
     requirement,
     extras: List[str],
     markers: Optional[str] = None,
+    options: Optional[str] = None,
 ) -> RequirementsWheelPackageEntry:
     uri = requirement
     name = None
@@ -282,7 +296,7 @@ def parse_wheel_requirements_entry(
         uri, name = requirement.split("#egg=")
 
     return RequirementsWheelPackageEntry(
-        source=source, uri=uri, name=name, markers=markers
+        source=source, uri=uri, name=name, markers=markers, options=options,
     )
 
 
@@ -291,13 +305,14 @@ def parse_direct_ref_requirements_entry(
     requirement,
     extras: List[str],
     markers: Optional[str] = None,
+    options: Optional[str] = None,
 ) -> RequirementsDirectRefEntry:
     name, uri = requirement.split("@")
     name = name.strip()
     uri = uri.strip()
 
     return RequirementsDirectRefEntry(
-        source=source, name=name, uri=uri, markers=markers,
+        source=source, name=name, uri=uri, markers=markers, options=options,
     )
 
 
@@ -306,6 +321,7 @@ def parse_package_requirements_entry(
     requirement: str,
     extras: List[str],
     markers: Optional[str] = None,
+    options: Optional[str] = None,
 ) -> RequirementsPackageEntry:
     operators = ["==", ">=", ">", "<=", "<"]
     for operator in operators:
@@ -316,14 +332,19 @@ def parse_package_requirements_entry(
         return RequirementsPackageEntry(
             source=source,
             name=parts[0],
-            extras=extras,
             operator=operator,
             version=parts[1],
             markers=markers,
+            extras=extras,
+            options=options,
         )
 
     return RequirementsPackageEntry(
-        source=source, name=requirement, extras=extras, markers=markers,
+        source=source,
+        name=requirement,
+        extras=extras,
+        markers=markers,
+        options=options,
     )
 
 
@@ -339,17 +360,26 @@ def _clean_line(line: str) -> str:
 
 def _split_requirement_and_markers(
     line: str,
-) -> Tuple[str, List[str], Optional[str]]:
-    requirement = line
-    markers = None
-    extras = []
+) -> Tuple[str, List[str], Optional[str], Optional[str]]:
+    requirement = []
+    requirement_parts = line.split(" ")
+    for index, part in enumerate(requirement_parts):
+        if index > 0 and part.startswith("-"):
+            break
 
+        requirement.append(part)
+
+    requirement = " ".join(requirement)
+    options = line[line.index(requirement) + len(requirement):].strip() or None
+
+    markers = None
     if ";" in requirement:
         requirement, markers = requirement.split(";")
 
         requirement = requirement.strip()
         markers = markers.strip()
 
+    extras = []
     extras_match = re.search(re.compile(r"\[.*\]"), requirement)
     if extras_match:
         matched_text = extras_match[0]
@@ -360,4 +390,4 @@ def _split_requirement_and_markers(
             for extra in matched_text.strip("[").strip("]").strip().split(",")
         ]
 
-    return requirement, extras, markers
+    return requirement, extras, markers, options

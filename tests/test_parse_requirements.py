@@ -90,6 +90,25 @@ def test_parse_requirements_editable_entry_with_extras():
     assert requirements[0].extras == ["extra1", "extra2"]
 
 
+def test_parse_requirements_editable_entry_with_options():
+    line = '-e ./mypackage --install-option="--test" --build-options="-e"'
+
+    requirements = list(parse_requirements_list(source, [line]))
+    assert len(requirements) == 1
+
+    assert isinstance(requirements[0], RequirementsEditableEntry)
+    assert requirements[0].source.path == source.path
+    assert requirements[0].source.line == line
+    assert requirements[0].source.line_number == 1
+    assert requirements[0].absolute_path == os.path.realpath(
+        os.path.join(os.getcwd(), "./mypackage")
+    )
+    assert (
+        requirements[0].options
+        == '--install-option="--test" --build-options="-e"'
+    )
+
+
 @pytest.mark.parametrize("vcs", ["git", "hg"])
 @pytest.mark.parametrize(
     "uri", ["https://github.com/org/repo", "git@github.com:org/repo.git"]

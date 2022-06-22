@@ -48,11 +48,15 @@ class RequirementsEditableEntry(RequirementsEntry):
     resolved_absolute_path: str
 
     extras: List[str] = field(default_factory=list)
+    options: Optional[str] = None
 
     def __str__(self) -> str:
         line = os.path.relpath(self.absolute_path, os.getcwd())
         if self.extras:
             line += "[" + ",".join(self.extras) + "]"
+
+        if self.options:
+            line += f" {self.options}"
 
         return f"-e {line}"
 
@@ -72,18 +76,23 @@ class RequirementsVCSPackageEntry(RequirementsEntry):
     tag: Optional[str] = None
     name: Optional[str] = None
 
+    options: Optional[str] = None
+
     def package_name(self) -> Optional[str]:
         return self.name
 
     def __str__(self) -> str:
-        result = f"{self.vcs}+{self.uri}"
+        line = f"{self.vcs}+{self.uri}"
         if self.tag:
-            result += f"@{self.tag}"
+            line += f"@{self.tag}"
 
         if self.name:
-            result += f"#egg={self.name}"
+            line += f"#egg={self.name}"
 
-        return result
+        if self.options:
+            line += f" {self.options}"
+
+        return line
 
 
 @dataclass
@@ -95,11 +104,15 @@ class RequirementsPathPackageEntry(RequirementsEntry):
     resolved_absolute_path: str
 
     extras: List[str] = field(default_factory=list)
+    options: Optional[str] = None
 
     def __str__(self) -> str:
         line = os.path.relpath(self.absolute_path, os.getcwd())
         if self.extras:
             line += "[" + ",".join(self.extras) + "]"
+
+        if self.options:
+            line += f" {self.options}"
 
         return f"{line}"
 
@@ -110,6 +123,7 @@ class RequirementsWheelPackageEntry(RequirementsEntry):
     name: Optional[str] = None
 
     markers: Optional[str] = None
+    options: Optional[str] = None
 
     def package_name(self) -> Optional[str]:
         return self.name
@@ -122,6 +136,9 @@ class RequirementsWheelPackageEntry(RequirementsEntry):
         if self.markers:
             line += f" ; {self.markers}"
 
+        if self.options:
+            line += f" {self.options}"
+
         return line
 
 
@@ -131,6 +148,7 @@ class RequirementsDirectRefEntry(RequirementsEntry):
     uri: str
 
     markers: Optional[str] = None
+    options: Optional[str] = None
 
     def package_name(self) -> Optional[str]:
         return self.name
@@ -139,6 +157,9 @@ class RequirementsDirectRefEntry(RequirementsEntry):
         line = f"{self.name} @ {self.uri}"
         if self.markers:
             line += f" ; {self.markers}"
+
+        if self.options:
+            line += f" {self.options}"
 
         return line
 
@@ -151,6 +172,7 @@ class RequirementsPackageEntry(RequirementsEntry):
     version: Optional[str] = None
 
     markers: Optional[str] = None
+    options: Optional[str] = None
 
     def package_name(self) -> Optional[str]:
         return self.name
@@ -169,5 +191,8 @@ class RequirementsPackageEntry(RequirementsEntry):
 
         if self.markers:
             line += f"; {self.markers}"
+
+        if self.options:
+            line += f" {self.options}"
 
         return line
